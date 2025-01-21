@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -11,13 +12,17 @@ public class Counter : MonoBehaviour
     private Coroutine _coroutine;
     private bool _isWorking = false;
 
+    public event Action<int> OnValueChanged;
+
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0) && _isWorking == false)
-            Begin();
+        if (Input.GetMouseButtonDown(0) == false)
+            return;
 
-        if (Input.GetMouseButtonDown(1) && _isWorking)
+        if (_isWorking)
             Stop();
+        else
+            Begin();
     }
 
     private void Begin()
@@ -41,7 +46,7 @@ public class Counter : MonoBehaviour
         {
             _count++;
 
-            Debug.Log(_count);
+            OnValueChanged?.Invoke(_count);
 
             yield return delay;
         }
