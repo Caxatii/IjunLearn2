@@ -1,41 +1,50 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 using Random = UnityEngine.Random;
 
-[RequireComponent(typeof(Rigidbody), typeof(MeshRenderer))]
-public class CubeDivider : MonoBehaviour, IPointerClickHandler
+public class CubeDivider : MonoBehaviour
 {
-    protected float Multiplier = 1;
+    [SerializeField] private Cube _cubePrefab;
 
-    protected Rigidbody Rigidbody;
-
-    public void OnPointerClick(PointerEventData eventData)
+    private void Update()
     {
-        Divide();
+        if (Input.GetMouseButtonDown(0) == false)
+            return;
+
+        if (GetRaycast(out RaycastHit hit))
+            if (hit.collider.TryGetComponent(out Cube cube))
+                DivideCube(cube);
     }
 
-    private void Divide()
+    private void DivideCube(Cube cube)
     {
-        if (Random.Range(0f, 1f) < Multiplier)
-        {
-            for (int i = 0; i < GetDivideAmount(); i++)
-                CreateCube();
-        }
+        float multiplier = cube.Multiplier;
+        Vector3 position = cube.transform.position;
 
-        Destroy(gameObject);
+        Destroy(cube.gameObject);
+
+        if (Random.Range(0f, 1f) > multiplier)
+            return;
+
+        for (int i = 0; i < GetDivideAmount(); i++)
+            CreateCube(position, multiplier);
     }
 
-    private void CreateCube()
+    private void CreateCube(Vector3 position, float multiplier)
     {
+        int divider = 2;
         float force = 5;
         float radius = 5;
-        float upward = 5;
-        int divider = 2;
 
-        CubeDivider cube = Instantiate(gameObject).GetComponent<CubeDivider>();
-        cube.Multiplier = Multiplier / divider;
-        cube.transform.localScale /= divider;
-        cube.Rigidbody.AddExplosionForce(force, transform.position, radius, upward, ForceMode.Impulse);
+        Cube newCube = Instantiate(_cubePrefab);
+        newCube.transform.position = position;
+        newCube.Multiplier = multiplier / divider;
+        newCube.transform.localScale *= newCube.Multiplier;
+        newCube.Body.AddExplosionForce(force, position, radius, default, ForceMode.Impulse);
+    }
+
+    private bool GetRaycast(out RaycastHit hit)
+    {
+        return Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit);
     }
 
     private int GetDivideAmount()
@@ -44,11 +53,5 @@ public class CubeDivider : MonoBehaviour, IPointerClickHandler
         int max = 6;
 
         return Random.Range(min, max);
-    }
-
-    private void OnEnable()
-    {
-        Rigidbody ??= GetComponent<Rigidbody>();
-        GetComponent<MeshRenderer>().material.color = Random.ColorHSV();
     }
 }
