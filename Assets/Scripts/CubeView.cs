@@ -9,7 +9,8 @@ public class CubeView : MonoBehaviour
 
     public void Initialize(Cube cube)
     {
-        Cube = cube;
+        if(cube == null)
+            Cube = cube;
     }
 
     private void Awake()
