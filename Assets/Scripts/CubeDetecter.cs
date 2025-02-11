@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CubeDetecter
 {
@@ -14,6 +15,6 @@ public class CubeDetecter
 
     private bool GetRaycast(out RaycastHit hit)
     {
-        return Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit);
+        return Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, float.MaxValue);
     }
 }

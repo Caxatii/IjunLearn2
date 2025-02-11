@@ -6,6 +6,7 @@ public class CubeDivider : MonoBehaviour
     [SerializeField] private CubeSpawner _spawner;
 
     private CubeDetecter _detector = new();
+    private CubeExploder _exploder = new();
 
     private void Update()
     {
@@ -21,11 +22,15 @@ public class CubeDivider : MonoBehaviour
         float multiplier = cubeView.Cube.Multiplier;
         Vector3 position = cubeView.transform.position;
 
+        if (Random.Range(0f, 1f) < multiplier)
+        {
+            _spawner.Spawn(position, multiplier);
+        }
+        else
+        {
+            _exploder.Explode(cubeView);
+        }
+
         Destroy(cubeView.gameObject);
-
-        if (Random.Range(0f, 1f) > multiplier)
-            return;
-
-        _spawner.Spawn(position, multiplier);
     }
 }

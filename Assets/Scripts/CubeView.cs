@@ -9,7 +9,7 @@ public class CubeView : MonoBehaviour
 
     public void Initialize(Cube cube)
     {
-        if(cube == null)
+        if(Cube == null)
             Cube = cube;
     }
 
