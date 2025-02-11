@@ -10,9 +10,6 @@ public class Cube : MonoBehaviour
 
     public Material Material {  get; private set; }
 
-    public void Reload() =>
-        _isGroundTouched = false;
-
     private void Awake()
     {
         Material = GetComponent<MeshRenderer>().material;
@@ -27,4 +24,7 @@ public class Cube : MonoBehaviour
                 OnGroundTouched?.Invoke(this);
             }
     }
+
+    public void Reload() =>
+        _isGroundTouched = false;
 }

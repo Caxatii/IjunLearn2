@@ -6,12 +6,15 @@ using Random = UnityEngine.Random;
 
 public class CubeLifespan : MonoBehaviour
 {
-    [SerializeField] private float _radius;
+    [SerializeField] private float _spawnRadius;
     [SerializeField] private float _spawnDelay;
 
     [SerializeField] private Cube _prefab;
 
     private ObjectPool<Cube> _pool;
+
+    private UserInput _input = new();
+    private CubeColorize _colorize = new(Color.white);
 
     private void Awake()
     {
@@ -22,9 +25,10 @@ public class CubeLifespan : MonoBehaviour
     {
         WaitForSeconds delay = new WaitForSeconds(_spawnDelay);
 
-        while(Input.GetKeyDown(KeyCode.Escape) == false)
+        while(_input.IsEscape == false)
         {
             Spawn();
+
             yield return delay;
         }
     }
@@ -35,9 +39,11 @@ public class CubeLifespan : MonoBehaviour
         cube.gameObject.SetActive(true);
         cube.OnGroundTouched += Prepare;
 
+        _colorize.Return(cube);
+
         Vector3 cubePosition = transform.position;
-        cubePosition.x += Random.Range(-_radius, _radius);
-        cubePosition.z += Random.Range(-_radius, _radius);
+        cubePosition.x += Random.Range(-_spawnRadius, _spawnRadius);
+        cubePosition.z += Random.Range(-_spawnRadius, _spawnRadius);
 
         cube.transform.position = cubePosition;
         cube.transform.rotation = Quaternion.identity;
@@ -48,7 +54,7 @@ public class CubeLifespan : MonoBehaviour
         float min = 2;
         float max = 5;
 
-        cube.Material.color = Random.ColorHSV();
+        _colorize.Random(cube);
         float time = Random.Range(min, max);
 
         StartCoroutine(Delay(() => Release(cube), time));
