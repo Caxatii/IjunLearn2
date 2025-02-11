@@ -40,6 +40,7 @@ public class CubeLifespan : MonoBehaviour
         cubePosition.z += Random.Range(-_radius, _radius);
 
         cube.transform.position = cubePosition;
+        cube.transform.rotation = Quaternion.identity;
     }
 
     private void Prepare(Cube cube)
