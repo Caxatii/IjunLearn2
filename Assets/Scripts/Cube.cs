@@ -1,9 +1,30 @@
-﻿public class Cube
+using System;
+using UnityEngine;
+
+[RequireComponent(typeof(Collider), typeof(MeshRenderer))]
+public class Cube : MonoBehaviour
 {
-    public Cube(float multiplier)
+    public event Action<Cube> OnGroundTouched;
+
+    private bool _isGroundTouched;
+
+    public Material Material {  get; private set; }
+
+    public void Reload() =>
+        _isGroundTouched = false;
+
+    private void Awake()
     {
-        Multiplier = multiplier;
+        Material = GetComponent<MeshRenderer>().material;
     }
 
-    public float Multiplier { get; }
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.TryGetComponent(out Platform platform))
+            if (_isGroundTouched == false)
+            {
+                _isGroundTouched = true;
+                OnGroundTouched?.Invoke(this);
+            }
+    }
 }
