@@ -14,11 +14,13 @@ public class CubeLifespan : MonoBehaviour
     private ObjectPool<Cube> _pool;
 
     private UserInput _input = new();
-    private CubeColorize _colorize = new(Color.white);
+    private CubeColorize _colorize = new(UnityEngine.Color.white);
 
     private void Awake()
     {
-        _pool = new ObjectPool<Cube>(createFunc: () => Instantiate(_prefab));
+        _pool = new ObjectPool<Cube>(createFunc: () => Create(),
+                                     actionOnGet: (cube) => GetCube(cube),
+                                     actionOnRelease: (cube) => ReleaseCube(cube));
     }
 
     private IEnumerator Start()
@@ -36,10 +38,6 @@ public class CubeLifespan : MonoBehaviour
     private void Spawn()
     {
         Cube cube = _pool.Get();
-        cube.gameObject.SetActive(true);
-        cube.OnGroundTouched += Prepare;
-
-        _colorize.Return(cube);
 
         Vector3 cubePosition = transform.position;
         cubePosition.x += Random.Range(-_spawnRadius, _spawnRadius);
@@ -49,24 +47,31 @@ public class CubeLifespan : MonoBehaviour
         cube.transform.rotation = Quaternion.identity;
     }
 
-    private void Prepare(Cube cube)
+    private void ReleaseCube(Cube cube)
     {
-        float min = 2;
-        float max = 5;
-
-        _colorize.Random(cube);
-        float time = Random.Range(min, max);
-
-        StartCoroutine(Delay(() => Release(cube), time));
-    }
-
-    private void Release(Cube cube)
-    {
-        cube.Material.color = Color.white;
-        cube.OnGroundTouched -= Prepare;
+        _colorize.Return(cube);
+        cube.GroundTouched -= Color;
+        cube.Destroyed -= _pool.Release;
         cube.gameObject.SetActive(false);
         cube.Reload();
-        _pool.Release(cube);
+    }
+
+    private void GetCube(Cube cube)
+    {
+        cube.gameObject.SetActive(true);
+        cube.GroundTouched += Color;
+        cube.Destroyed += _pool.Release;
+        _colorize.Return(cube);
+    }
+
+    private Cube Create()
+    {
+        return Instantiate(_prefab);
+    }
+
+    private void Color(Cube cube)
+    {
+        _colorize.Paint(cube);
     }
 
     private IEnumerator Delay(Action action, float time)

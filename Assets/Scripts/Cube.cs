@@ -1,12 +1,15 @@
 using System;
+using System.Collections;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(Collider), typeof(MeshRenderer))]
 public class Cube : MonoBehaviour
 {
-    public event Action<Cube> OnGroundTouched;
-
     private bool _isGroundTouched;
+
+    public event Action<Cube> GroundTouched;
+    public event Action<Cube> Destroyed;
 
     public Material Material {  get; private set; }
 
@@ -17,14 +20,24 @@ public class Cube : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.TryGetComponent(out Platform platform))
-            if (_isGroundTouched == false)
+        if (_isGroundTouched == false)
+            if ( collision.gameObject.TryGetComponent(out Platform platform))
             {
                 _isGroundTouched = true;
-                OnGroundTouched?.Invoke(this);
+                GroundTouched?.Invoke(this);
+                StartCoroutine(DestroyTimer());
             }
     }
 
     public void Reload() =>
         _isGroundTouched = false;
+
+    private IEnumerator DestroyTimer()
+    {
+        int min = 2;
+        int max = 5;
+
+        yield return new WaitForSeconds(Random.Range(min, max));
+        Destroyed?.Invoke(this);
+    }
 }

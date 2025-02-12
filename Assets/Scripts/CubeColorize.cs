@@ -9,7 +9,7 @@ public class CubeColorize
         _default = color;
     }
 
-    public void Random(Cube cube)
+    public void Paint(Cube cube)
     {
         cube.Material.color = UnityEngine.Random.ColorHSV();
     }
