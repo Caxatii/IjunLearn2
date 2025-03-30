@@ -18,12 +18,12 @@ public class GameAudioMixer : MonoBehaviour
     
     public void SetButtonVolume(float volume)
     {
-        _mixer.audioMixer.SetFloat(GameData.Audio.Buttons, GetVolume(volume));
+        _mixer.audioMixer.SetFloat(GameData.Audio.Buttons, ConvertVolume(volume));
     }
 
     public void SetMusicVolume(float volume)
     {
-        _mixer.audioMixer.SetFloat(GameData.Audio.Music, GetVolume(volume));
+        _mixer.audioMixer.SetFloat(GameData.Audio.Music, ConvertVolume(volume));
     }
 
     public void ToggleMasterVolume()
@@ -42,10 +42,10 @@ public class GameAudioMixer : MonoBehaviour
 
     private void ChangeMasterVolume(float volume)
     {
-        _mixer.audioMixer.SetFloat(GameData.Audio.Master, GetVolume(volume));
+        _mixer.audioMixer.SetFloat(GameData.Audio.Master, ConvertVolume(volume));
     }
     
-    private float GetVolume(float volume)
+    private float ConvertVolume(float volume)
     {
         int minVolume = -80;
         int pitch = 20;
